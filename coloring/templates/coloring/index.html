@@ -29,27 +29,39 @@
         
         <br></br>
         
-        <h4><label for="myTitle">Drawing Title</label></h4>
+        <h4><label for="myTitle"><span id="drawingTitle">{{ drawing.title }}</span></label></h4>
         <textarea id="myTitle"></textarea>
 
         <br></br>
         
         <button class="btn btn-primary btn-large" id="save">Save</button>
         <button class="btn btn-danger btn-large" id="reset">Reset</button>
-        
+        <h0 style="color:white">Points: <span id="drawingPoints">{{ drawing.points }}</span></h0>
     </div>
   </div>
   <script>
     
     window.onload = function() {
-
-      var points = []; 
+      // var points;
+      // if(drawing.points)
+      //   points = [];
+      // else
+      //   points = JSON.parse(drawing.points);
+      console.log("POINTS= " + $("#drawingPoints").text());
+      var points = JSON.parse($("#drawingPoints").text());
+      var first = true;
+      // paper.view.draw();
+      // var points = [];
+      // if({{drawing.points}})
+      //   points = JSON.parse({{drawing.points}});
 
       $('#save').on("click", function(){
 
+        points.push([-1,-1]);
         // send title, points, and author name to the server
         var data_to_send = {
-          "title": $("#myTitle").val()
+          "title": $("#myTitle").val(),
+          "points": JSON.stringify(points)
         };
 
         // This ajax request sends a POST request to the server
@@ -77,10 +89,11 @@
         
     		var tool = new paper.Tool();
     		var path;
-    
+        
     		// Define a mousedown and mousedrag handler
     		tool.onMouseDown = function(event) {
-    			path = new paper.Path();
+          points.push([-1,-1]);
+          path = new paper.Path();
     			path.strokeColor = 'black';
     			path.add(event.point);
           points.push([event.point.x, event.point.y]); 
@@ -89,6 +102,7 @@
     		tool.onMouseDrag = function(event) {
     			path.add(event.point);
           points.push([event.point.x, event.point.y]); 
+          console.log(points);
     		}      
       }
 
@@ -96,6 +110,18 @@
         // setup paper.js
         paper.setup('myCanvas');
         basicDrawingTool();
+        var firstPath = new paper.Path();
+        firstPath.strokeColor = 'black';
+        for(var i = 0; i < points.length; i++){
+          if(points[i][0] === -1){
+            firstPath = new paper.Path();
+            firstPath.strokeColor = 'black';
+          }
+          else{
+            firstPath.add(new paper.Point(points[i][0], points[i][1]));
+          }
+          
+        }
       }
 
       init();
